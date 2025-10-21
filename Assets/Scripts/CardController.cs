@@ -8,10 +8,10 @@ public class CardController : MonoBehaviour
     public Sprite frontSprite;
     public Sprite backSprite;
 
-    Image image;
-    bool isFlipped = false;
-    bool isMatched = false;
-    bool isAnimating = false;
+    private Image image;
+    private bool isFlipped = false;
+    private bool isMatched = false;
+    private bool isAnimating = false;
 
     void Awake()
     {
@@ -25,12 +25,13 @@ public class CardController : MonoBehaviour
 
     public void OnClick()
     {
-        if (isMatched || isAnimating) return;
-        if (!isFlipped)
-        {
-            StartCoroutine(FlipToFront());
-            GameManager.instance.CardRevealed(this);
-        }
+        // ❌ Stop if game manager isn't ready or we're mid-check
+        if (GameManager.instance == null) return;
+        if (GameManager.instance.IsChecking()) return; // <== NEW
+        if (isMatched || isAnimating || isFlipped) return;
+
+        StartCoroutine(FlipToFront());
+        GameManager.instance.CardRevealed(this);
     }
 
     public IEnumerator FlipToFront()
@@ -80,7 +81,6 @@ public class CardController : MonoBehaviour
     public void SetMatched()
     {
         isMatched = true;
-        Debug.Log($"{name} matched!");
     }
 
     public bool IsMatched() => isMatched;

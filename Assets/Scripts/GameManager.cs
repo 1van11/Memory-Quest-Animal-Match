@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     private int attempts = 0;
     private float elapsedTime = 0f;
     private bool isPlaying = false;
+    private bool isChecking = false;
 
     private List<CardController> revealedCards = new List<CardController>();
 
@@ -39,7 +40,8 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
-    {
+    {   
+        Time.timeScale = 1;
         SetupLevel1();
         UpdateScoreText();
         UpdateAttemptText();
@@ -74,11 +76,14 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        List<Sprite> pool = new List<Sprite>
+        int totalPairs = gridContainer.childCount / 2;
+        List<Sprite> pool = new List<Sprite>();
+
+        for (int i = 0; i < totalPairs; i++)
         {
-            animalSprites[0], animalSprites[0],
-            animalSprites[1], animalSprites[1]
-        };
+        pool.Add(animalSprites[i % animalSprites.Length]);
+        pool.Add(animalSprites[i % animalSprites.Length]);
+        }
 
         Shuffle(pool);
 
@@ -110,55 +115,68 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator LevelIntroPeek()
+{
+    yield return new WaitForSeconds(0.1f); // small delay so everything activates
+
+    // Flip all cards to front
+    foreach (Transform t in gridContainer)
     {
-        yield return new WaitForEndOfFrame();
-
-        foreach (Transform t in gridContainer)
-        {
-            CardController cc = t.GetComponent<CardController>();
-            StartCoroutine(cc.FlipToFront());
-        }
-
-        yield return new WaitForSeconds(2f);
-
-        foreach (Transform t in gridContainer)
-        {
-            CardController cc = t.GetComponent<CardController>();
-            StartCoroutine(cc.FlipToBack());
-        }
+        CardController cc = t.GetComponent<CardController>();
+        StartCoroutine(cc.FlipToFront());
     }
+
+    // Wait while they’re showing
+    yield return new WaitForSeconds(2f);
+
+    // Flip them all back
+    foreach (Transform t in gridContainer)
+    {
+        CardController cc = t.GetComponent<CardController>();
+        StartCoroutine(cc.FlipToBack());
+    }
+}
+
 
     public void CardRevealed(CardController card)
     {
-        revealedCards.Add(card);
+    // Don’t allow revealing more than 2 or during checking
+    if (isChecking || revealedCards.Contains(card) || revealedCards.Count >= 2)
+        return;
 
-        if (revealedCards.Count == 2)
-            StartCoroutine(CheckMatch());
+    revealedCards.Add(card);
+
+    if (revealedCards.Count == 2)
+        StartCoroutine(CheckMatch());
     }
+
 
     IEnumerator CheckMatch()
     {
-        yield return new WaitForSeconds(0.6f);
+    isChecking = true; // 🔒 lock new clicks
+    yield return new WaitForSeconds(0.6f);
 
-        // ✅ Every two revealed cards = 1 attempt
-        attempts++;
-        UpdateAttemptText();
+    attempts++;
+    UpdateAttemptText();
 
-        if (revealedCards[0].frontSprite == revealedCards[1].frontSprite)
-        {
-            revealedCards[0].SetMatched();
-            revealedCards[1].SetMatched();
-            AddScore(5); // ✅ +5 points for correct match
-        }
-        else
-        {
-            StartCoroutine(revealedCards[0].FlipToBack());
-            StartCoroutine(revealedCards[1].FlipToBack());
-        }
-
-        revealedCards.Clear();
-        CheckLevelComplete();
+    if (revealedCards[0].frontSprite == revealedCards[1].frontSprite)
+    {
+        revealedCards[0].SetMatched();
+        revealedCards[1].SetMatched();
+        AddScore(5);
     }
+    else
+    {
+        StartCoroutine(revealedCards[0].FlipToBack());
+        StartCoroutine(revealedCards[1].FlipToBack());
+    }
+
+    // small delay to avoid overlap during flipping
+    yield return new WaitForSeconds(0.5f);
+
+    revealedCards.Clear();
+    isChecking = false; // 🔓 unlock input again
+    CheckLevelComplete();
+}
 
     void AddScore(int points)
     {
@@ -220,4 +238,10 @@ public class GameManager : MonoBehaviour
         if (summaryTimeText != null)
             summaryTimeText.text = finalTime;
     }
+
+    public bool IsChecking()
+    {
+    return isChecking;
+    }
+
 }

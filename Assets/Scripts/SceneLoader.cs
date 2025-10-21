@@ -26,7 +26,8 @@ public class SceneLoader : MonoBehaviour
     }
 
     public void LoadScene()
-    {
+    {   
+        Time.timeScale = 1;
         if (!string.IsNullOrEmpty(sceneToLoad))
         {
             SceneManager.LoadScene(sceneToLoad);
