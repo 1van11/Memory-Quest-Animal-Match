@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +16,22 @@ public class GameManager : MonoBehaviour
     [Header("Level 1 - Animal faces (2 unique)")]
     public Sprite[] animalSprites;
 
-    List<CardController> revealedCards = new List<CardController>();
+    [Header("UI References")]
+    public TMP_Text scoreText;        // Gameplay score display
+    public TMP_Text attemptText;      // Gameplay attempt display
+    public TMP_Text timerText;        // Gameplay timer display
+
+    [Header("Summary UI References")]
+    public TMP_Text summaryScoreText;    // Summary: Final score
+    public TMP_Text summaryAttemptText;  // Summary: Final attempts
+    public TMP_Text summaryTimeText;     // Summary: Final time
+
+    private int score = 0;
+    private int attempts = 0;
+    private float elapsedTime = 0f;
+    private bool isPlaying = false;
+
+    private List<CardController> revealedCards = new List<CardController>();
 
     void Awake()
     {
@@ -25,6 +41,29 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         SetupLevel1();
+        UpdateScoreText();
+        UpdateAttemptText();
+        UpdateTimerText();
+        isPlaying = true;
+    }
+
+    void Update()
+    {
+        if (isPlaying)
+        {
+            elapsedTime += Time.deltaTime;
+            UpdateTimerText();
+        }
+    }
+
+    void UpdateTimerText()
+    {
+        int minutes = Mathf.FloorToInt(elapsedTime / 60);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60);
+        string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+        if (timerText != null)
+            timerText.text = formattedTime;
     }
 
     public void SetupLevel1()
@@ -35,18 +74,16 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        List<Sprite> pool = new List<Sprite>();
-        pool.Add(animalSprites[0]);
-        pool.Add(animalSprites[0]);
-        pool.Add(animalSprites[1]);
-        pool.Add(animalSprites[1]);
+        List<Sprite> pool = new List<Sprite>
+        {
+            animalSprites[0], animalSprites[0],
+            animalSprites[1], animalSprites[1]
+        };
 
         Shuffle(pool);
 
         foreach (Transform child in gridContainer)
-        {
             Destroy(child.gameObject);
-        }
 
         foreach (Sprite s in pool)
         {
@@ -68,9 +105,7 @@ public class GameManager : MonoBehaviour
         for (int i = list.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
-            T tmp = list[i];
-            list[i] = list[j];
-            list[j] = tmp;
+            (list[i], list[j]) = (list[j], list[i]);
         }
     }
 
@@ -98,19 +133,22 @@ public class GameManager : MonoBehaviour
         revealedCards.Add(card);
 
         if (revealedCards.Count == 2)
-        {
             StartCoroutine(CheckMatch());
-        }
     }
 
     IEnumerator CheckMatch()
     {
         yield return new WaitForSeconds(0.6f);
 
+        // ✅ Every two revealed cards = 1 attempt
+        attempts++;
+        UpdateAttemptText();
+
         if (revealedCards[0].frontSprite == revealedCards[1].frontSprite)
         {
             revealedCards[0].SetMatched();
             revealedCards[1].SetMatched();
+            AddScore(5); // ✅ +5 points for correct match
         }
         else
         {
@@ -120,6 +158,24 @@ public class GameManager : MonoBehaviour
 
         revealedCards.Clear();
         CheckLevelComplete();
+    }
+
+    void AddScore(int points)
+    {
+        score += points;
+        UpdateScoreText();
+    }
+
+    void UpdateScoreText()
+    {
+        if (scoreText != null)
+            scoreText.text = score.ToString();
+    }
+
+    void UpdateAttemptText()
+    {
+        if (attemptText != null)
+            attemptText.text = attempts.ToString();
     }
 
     void CheckLevelComplete()
@@ -138,9 +194,30 @@ public class GameManager : MonoBehaviour
 
         if (allMatched)
         {
+            isPlaying = false; // ✅ Stop timer
             Debug.Log("Level Complete!");
+
             if (summaryUI != null)
+            {
                 summaryUI.SetActive(true);
+                ShowSummaryResults();
+            }
         }
+    }
+
+    void ShowSummaryResults()
+    {
+        int minutes = Mathf.FloorToInt(elapsedTime / 60);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60);
+        string finalTime = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+        if (summaryScoreText != null)
+            summaryScoreText.text = score.ToString();
+
+        if (summaryAttemptText != null)
+            summaryAttemptText.text = attempts.ToString();
+
+        if (summaryTimeText != null)
+            summaryTimeText.text = finalTime;
     }
 }
