@@ -17,14 +17,14 @@ public class GameManager : MonoBehaviour
     public Sprite[] animalSprites;
 
     [Header("UI References")]
-    public TMP_Text scoreText;        // Gameplay score display
-    public TMP_Text attemptText;      // Gameplay attempt display
-    public TMP_Text timerText;        // Gameplay timer display
+    public TMP_Text scoreText;
+    public TMP_Text attemptText;
+    public TMP_Text timerText;
 
     [Header("Summary UI References")]
-    public TMP_Text summaryScoreText;    // Summary: Final score
-    public TMP_Text summaryAttemptText;  // Summary: Final attempts
-    public TMP_Text summaryTimeText;     // Summary: Final time
+    public TMP_Text summaryScoreText;
+    public TMP_Text summaryAttemptText;
+    public TMP_Text summaryTimeText;
 
     private int score = 0;
     private int attempts = 0;
@@ -40,13 +40,14 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
-    {   
+    {
         Time.timeScale = 1;
         SetupLevel1();
         UpdateScoreText();
         UpdateAttemptText();
         UpdateTimerText();
-        isPlaying = true;
+
+        // ⛔ Removed isPlaying = true; here (we start later instead)
     }
 
     void Update()
@@ -72,7 +73,7 @@ public class GameManager : MonoBehaviour
     {
         if (animalSprites == null || animalSprites.Length < 2)
         {
-            Debug.LogError("Assign 2 animal sprites for Level 1 in GameManager.");
+            Debug.LogError("Assign at least 2 animal sprites for Level 1 in GameManager.");
             return;
         }
 
@@ -81,8 +82,8 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < totalPairs; i++)
         {
-        pool.Add(animalSprites[i % animalSprites.Length]);
-        pool.Add(animalSprites[i % animalSprites.Length]);
+            pool.Add(animalSprites[i % animalSprites.Length]);
+            pool.Add(animalSprites[i % animalSprites.Length]);
         }
 
         Shuffle(pool);
@@ -115,68 +116,68 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator LevelIntroPeek()
-{
-    yield return new WaitForSeconds(0.1f); // small delay so everything activates
-
-    // Flip all cards to front
-    foreach (Transform t in gridContainer)
     {
-        CardController cc = t.GetComponent<CardController>();
-        StartCoroutine(cc.FlipToFront());
+        yield return new WaitForSeconds(0.1f); // Small delay so everything activates
+
+        // Flip all cards to front
+        foreach (Transform t in gridContainer)
+        {
+            CardController cc = t.GetComponent<CardController>();
+            StartCoroutine(cc.FlipToFront());
+        }
+
+        // Wait while they're showing
+        yield return new WaitForSeconds(2f);
+
+        // Flip them all back
+        foreach (Transform t in gridContainer)
+        {
+            CardController cc = t.GetComponent<CardController>();
+            StartCoroutine(cc.FlipToBack());
+        }
+
+        // ✅ Start the timer AFTER cards have flipped back
+        yield return new WaitForSeconds(0.5f);
+        isPlaying = true;
     }
-
-    // Wait while they’re showing
-    yield return new WaitForSeconds(2f);
-
-    // Flip them all back
-    foreach (Transform t in gridContainer)
-    {
-        CardController cc = t.GetComponent<CardController>();
-        StartCoroutine(cc.FlipToBack());
-    }
-}
-
 
     public void CardRevealed(CardController card)
     {
-    // Don’t allow revealing more than 2 or during checking
-    if (isChecking || revealedCards.Contains(card) || revealedCards.Count >= 2)
-        return;
+        if (isChecking || revealedCards.Contains(card) || revealedCards.Count >= 2)
+            return;
 
-    revealedCards.Add(card);
+        revealedCards.Add(card);
 
-    if (revealedCards.Count == 2)
-        StartCoroutine(CheckMatch());
+        if (revealedCards.Count == 2)
+            StartCoroutine(CheckMatch());
     }
-
 
     IEnumerator CheckMatch()
     {
-    isChecking = true; // 🔒 lock new clicks
-    yield return new WaitForSeconds(0.6f);
+        isChecking = true;
+        yield return new WaitForSeconds(0.6f);
 
-    attempts++;
-    UpdateAttemptText();
+        attempts++;
+        UpdateAttemptText();
 
-    if (revealedCards[0].frontSprite == revealedCards[1].frontSprite)
-    {
-        revealedCards[0].SetMatched();
-        revealedCards[1].SetMatched();
-        AddScore(5);
+        if (revealedCards[0].frontSprite == revealedCards[1].frontSprite)
+        {
+            revealedCards[0].SetMatched();
+            revealedCards[1].SetMatched();
+            AddScore(5);
+        }
+        else
+        {
+            StartCoroutine(revealedCards[0].FlipToBack());
+            StartCoroutine(revealedCards[1].FlipToBack());
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        revealedCards.Clear();
+        isChecking = false;
+        CheckLevelComplete();
     }
-    else
-    {
-        StartCoroutine(revealedCards[0].FlipToBack());
-        StartCoroutine(revealedCards[1].FlipToBack());
-    }
-
-    // small delay to avoid overlap during flipping
-    yield return new WaitForSeconds(0.5f);
-
-    revealedCards.Clear();
-    isChecking = false; // 🔓 unlock input again
-    CheckLevelComplete();
-}
 
     void AddScore(int points)
     {
@@ -241,7 +242,6 @@ public class GameManager : MonoBehaviour
 
     public bool IsChecking()
     {
-    return isChecking;
+        return isChecking;
     }
-
 }
