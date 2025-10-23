@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     [Header("Level 1 - Animal faces (2 unique)")]
     public Sprite[] animalSprites;
 
+    [Header("Animal Sounds")]
+    public AudioSource audioSource;
+    public AudioClip catSound;
+    public AudioClip dogSound;
+
     [Header("UI References")]
     public TMP_Text scoreText;
     public TMP_Text attemptText;
@@ -26,13 +31,20 @@ public class GameManager : MonoBehaviour
     public TMP_Text summaryAttemptText;
     public TMP_Text summaryTimeText;
 
+    [Header("Fun Fact UI")]
+    public GameObject funFactPanel;
+    public TMP_Text funFactText;
+
     private int score = 0;
     private int attempts = 0;
     private float elapsedTime = 0f;
     private bool isPlaying = false;
     private bool isChecking = false;
+    private bool isShowingFunFact = false;
 
     private List<CardController> revealedCards = new List<CardController>();
+
+    private Dictionary<string, string> funFacts = new Dictionary<string, string>();
 
     void Awake()
     {
@@ -42,12 +54,17 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Time.timeScale = 1;
+        SetupFunFacts();
         SetupLevel1();
         UpdateScoreText();
         UpdateAttemptText();
         UpdateTimerText();
+    }
 
-        // ⛔ Removed isPlaying = true; here (we start later instead)
+    void SetupFunFacts()
+    {
+        funFacts.Add("Cat", "Cats sleep for about 70% of their lives. They can also make over 100 different sounds.");
+        funFacts.Add("Dog", "A dog's sense of smell is up to 100,000 times stronger than a human’s. They can also learn more than 1,000 words.");
     }
 
     void Update()
@@ -64,7 +81,6 @@ public class GameManager : MonoBehaviour
         int minutes = Mathf.FloorToInt(elapsedTime / 60);
         int seconds = Mathf.FloorToInt(elapsedTime % 60);
         string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds);
-
         if (timerText != null)
             timerText.text = formattedTime;
     }
@@ -103,6 +119,9 @@ public class GameManager : MonoBehaviour
         if (summaryUI != null)
             summaryUI.SetActive(false);
 
+        if (funFactPanel != null)
+            funFactPanel.SetActive(false);
+
         StartCoroutine(LevelIntroPeek());
     }
 
@@ -117,26 +136,22 @@ public class GameManager : MonoBehaviour
 
     IEnumerator LevelIntroPeek()
     {
-        yield return new WaitForSeconds(0.1f); // Small delay so everything activates
+        yield return new WaitForSeconds(0.1f);
 
-        // Flip all cards to front
         foreach (Transform t in gridContainer)
         {
             CardController cc = t.GetComponent<CardController>();
             StartCoroutine(cc.FlipToFront());
         }
 
-        // Wait while they're showing
         yield return new WaitForSeconds(2f);
 
-        // Flip them all back
         foreach (Transform t in gridContainer)
         {
             CardController cc = t.GetComponent<CardController>();
             StartCoroutine(cc.FlipToBack());
         }
 
-        // ✅ Start the timer AFTER cards have flipped back
         yield return new WaitForSeconds(0.5f);
         isPlaying = true;
     }
@@ -165,6 +180,16 @@ public class GameManager : MonoBehaviour
             revealedCards[0].SetMatched();
             revealedCards[1].SetMatched();
             AddScore(5);
+
+            string animalName = revealedCards[0].frontSprite.name;
+
+            PlayAnimalSound(animalName);
+
+            if (funFacts.ContainsKey(animalName))
+            {
+                ShowFunFact(funFacts[animalName]);
+
+            }
         }
         else
         {
@@ -176,7 +201,28 @@ public class GameManager : MonoBehaviour
 
         revealedCards.Clear();
         isChecking = false;
+
+        // Wait until the fun fact is done showing before checking level complete
+        StartCoroutine(WaitForFunFactThenCheckComplete());
+    }
+
+    IEnumerator WaitForFunFactThenCheckComplete()
+    {
+        while (isShowingFunFact)
+        {
+            yield return null;
+        }
         CheckLevelComplete();
+    }
+
+    void PlayAnimalSound(string animalName)
+    {
+        if (audioSource == null) return;
+
+        if (animalName == "Cat" && catSound != null)
+            audioSource.PlayOneShot(catSound);
+        else if (animalName == "Dog" && dogSound != null)
+            audioSource.PlayOneShot(dogSound);
     }
 
     void AddScore(int points)
@@ -198,31 +244,44 @@ public class GameManager : MonoBehaviour
     }
 
     void CheckLevelComplete()
+{
+    bool allMatched = true;
+
+    foreach (Transform t in gridContainer)
     {
-        bool allMatched = true;
-
-        foreach (Transform t in gridContainer)
+        CardController cc = t.GetComponent<CardController>();
+        if (!cc.IsMatched())
         {
-            CardController cc = t.GetComponent<CardController>();
-            if (!cc.IsMatched())
-            {
-                allMatched = false;
-                break;
-            }
-        }
-
-        if (allMatched)
-        {
-            isPlaying = false; // ✅ Stop timer
-            Debug.Log("Level Complete!");
-
-            if (summaryUI != null)
-            {
-                summaryUI.SetActive(true);
-                ShowSummaryResults();
-            }
+            allMatched = false;
+            break;
         }
     }
+
+    if (allMatched)
+    {
+        // ⛔ Stop the timer immediately
+        isPlaying = false;
+        Debug.Log("Level Complete!");
+
+        StartCoroutine(ShowSummaryAfterDelay());
+    }
+}
+
+
+    IEnumerator ShowSummaryAfterDelay()
+{
+    // short buffer delay before summary
+    yield return new WaitForSeconds(0.3f);
+
+    isPlaying = false; // 🛑 Ensure timer stays stopped
+
+    if (summaryUI != null)
+    {
+        summaryUI.SetActive(true);
+        ShowSummaryResults();
+    }
+}
+
 
     void ShowSummaryResults()
     {
@@ -238,6 +297,25 @@ public class GameManager : MonoBehaviour
 
         if (summaryTimeText != null)
             summaryTimeText.text = finalTime;
+    }
+
+    void ShowFunFact(string fact)
+    {
+        if (funFactPanel != null && funFactText != null)
+        {
+            funFactText.text = fact;
+            funFactPanel.SetActive(true);
+            StartCoroutine(HideFunFactAfterDelay());
+        }
+    }
+
+    IEnumerator HideFunFactAfterDelay()
+    {
+        isShowingFunFact = true;
+        yield return new WaitForSeconds(3f);
+        if (funFactPanel != null)
+            funFactPanel.SetActive(false);
+        isShowingFunFact = false;
     }
 
     public bool IsChecking()
