@@ -384,7 +384,7 @@ IEnumerator TypeSummaryResults()
         yield return new WaitForSeconds(typingSpeed);
     }
 
-    yield return new WaitForSeconds(0.3f);
+    yield return new WaitForSeconds(0.8f);
 
     // ⏱ Then type the time
     foreach (char c in timeString)
@@ -393,7 +393,7 @@ IEnumerator TypeSummaryResults()
         yield return new WaitForSeconds(typingSpeed);
     }
 
-    yield return new WaitForSeconds(0.3f);
+    yield return new WaitForSeconds(0.8f);
 
     // 🧠 Finally type the attempts
     foreach (char c in attemptString)

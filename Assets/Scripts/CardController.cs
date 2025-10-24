@@ -61,20 +61,60 @@ public class CardController : MonoBehaviour
     }
 
     IEnumerator Flip(float startAngle, float endAngle)
+{
+    float duration = 0.4f; // slightly slower for smoothness
+    float time = 0f;
+
+    while (time < duration)
     {
-        float duration = 0.25f;
-        float time = 0f;
+        // Ease in/out for smoother rotation
+        float t = time / duration;
+        t = t * t * (3f - 2f * t); // Smoothstep curve
 
-        while (time < duration)
-        {
-            float angle = Mathf.Lerp(startAngle, endAngle, time / duration);
-            transform.localRotation = Quaternion.Euler(0, angle, 0);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.localRotation = Quaternion.Euler(0, endAngle, 0);
+        float angle = Mathf.Lerp(startAngle, endAngle, t);
+        transform.localRotation = Quaternion.Euler(0, angle, 0);
+        time += Time.deltaTime;
+        yield return null;
     }
+
+    transform.localRotation = Quaternion.Euler(0, endAngle, 0);
+
+    // Optional bounce (tiny wobble effect after flip)
+    if (endAngle == 0f)
+    {
+        StartCoroutine(BounceEffect());
+    }
+}
+
+    IEnumerator BounceEffect()
+{
+    float bounceTime = 0.15f;
+    float bounceAmount = 1.05f; // 5% bigger scale bounce
+
+    Vector3 originalScale = transform.localScale;
+    Vector3 targetScale = originalScale * bounceAmount;
+
+    float t = 0f;
+    while (t < bounceTime)
+    {
+        float scale = Mathf.Lerp(1f, bounceAmount, t / bounceTime);
+        transform.localScale = originalScale * scale;
+        t += Time.deltaTime;
+        yield return null;
+    }
+
+    t = 0f;
+    while (t < bounceTime)
+    {
+        float scale = Mathf.Lerp(bounceAmount, 1f, t / bounceTime);
+        transform.localScale = originalScale * scale;
+        t += Time.deltaTime;
+        yield return null;
+    }
+
+    transform.localScale = originalScale;
+}
+
 
     public void ShowBackInstant()
     {
