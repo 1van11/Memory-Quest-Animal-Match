@@ -25,11 +25,17 @@ public class CardController : MonoBehaviour
 
     public void OnClick()
     {
-        // ❌ Stop if game manager isn't ready or we're mid-check
+        // 🚫 Stop if game manager not ready
         if (GameManager.instance == null) return;
-        if (GameManager.instance.IsChecking()) return; // <== NEW
+
+        // 🚫 Block if checking pairs OR fun fact showing OR interactivity off
+        if (GameManager.instance.IsChecking()) return;
+        if (!GameManager.instance.CanInteract()) return;
+
+        // 🚫 Skip if matched, flipping, or already flipped
         if (isMatched || isAnimating || isFlipped) return;
 
+        // ✅ Flip and notify GameManager
         StartCoroutine(FlipToFront());
         GameManager.instance.CardRevealed(this);
     }

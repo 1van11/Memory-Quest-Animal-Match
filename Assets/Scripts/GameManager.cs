@@ -41,9 +41,9 @@ public class GameManager : MonoBehaviour
     private bool isPlaying = false;
     private bool isChecking = false;
     private bool isShowingFunFact = false;
+    private bool canInteract = true;
 
     private List<CardController> revealedCards = new List<CardController>();
-
     private Dictionary<string, string> funFacts = new Dictionary<string, string>();
 
     void Awake()
@@ -84,6 +84,15 @@ public class GameManager : MonoBehaviour
         if (timerText != null)
             timerText.text = formattedTime;
     }
+
+    public void OnClick()
+{
+    // Stop clicking while fun fact or checking pairs
+    if (!GameManager.instance.CanInteract() || GameManager.instance.IsChecking())
+        return;
+
+    // Your existing flip logic here
+}
 
     public void SetupLevel1()
     {
@@ -188,7 +197,6 @@ public class GameManager : MonoBehaviour
             if (funFacts.ContainsKey(animalName))
             {
                 ShowFunFact(funFacts[animalName]);
-
             }
         }
         else
@@ -202,7 +210,6 @@ public class GameManager : MonoBehaviour
         revealedCards.Clear();
         isChecking = false;
 
-        // Wait until the fun fact is done showing before checking level complete
         StartCoroutine(WaitForFunFactThenCheckComplete());
     }
 
@@ -244,82 +251,156 @@ public class GameManager : MonoBehaviour
     }
 
     void CheckLevelComplete()
-{
-    bool allMatched = true;
-
-    foreach (Transform t in gridContainer)
     {
-        CardController cc = t.GetComponent<CardController>();
-        if (!cc.IsMatched())
+        bool allMatched = true;
+
+        foreach (Transform t in gridContainer)
         {
-            allMatched = false;
-            break;
+            CardController cc = t.GetComponent<CardController>();
+            if (!cc.IsMatched())
+            {
+                allMatched = false;
+                break;
+            }
+        }
+
+        if (allMatched)
+        {
+            isPlaying = false;
+            Debug.Log("Level Complete!");
+            StartCoroutine(ShowSummaryAfterDelay());
         }
     }
-
-    if (allMatched)
-    {
-        // ⛔ Stop the timer immediately
-        isPlaying = false;
-        Debug.Log("Level Complete!");
-
-        StartCoroutine(ShowSummaryAfterDelay());
-    }
-}
-
 
     IEnumerator ShowSummaryAfterDelay()
-{
-    // short buffer delay before summary
-    yield return new WaitForSeconds(0.3f);
-
-    isPlaying = false; // 🛑 Ensure timer stays stopped
-
-    if (summaryUI != null)
     {
-        summaryUI.SetActive(true);
-        ShowSummaryResults();
-    }
-}
+        yield return new WaitForSeconds(0.3f);
+        isPlaying = false;
 
-
-    void ShowSummaryResults()
-    {
-        int minutes = Mathf.FloorToInt(elapsedTime / 60);
-        int seconds = Mathf.FloorToInt(elapsedTime % 60);
-        string finalTime = string.Format("{0:00}:{1:00}", minutes, seconds);
-
-        if (summaryScoreText != null)
-            summaryScoreText.text = score.ToString();
-
-        if (summaryAttemptText != null)
-            summaryAttemptText.text = attempts.ToString();
-
-        if (summaryTimeText != null)
-            summaryTimeText.text = finalTime;
-    }
-
-    void ShowFunFact(string fact)
-    {
-        if (funFactPanel != null && funFactText != null)
+        if (summaryUI != null)
         {
-            funFactText.text = fact;
-            funFactPanel.SetActive(true);
-            StartCoroutine(HideFunFactAfterDelay());
+            summaryUI.SetActive(true);
+            ShowSummaryResults();
         }
     }
 
-    IEnumerator HideFunFactAfterDelay()
+    void ShowSummaryResults()
+{
+    // Start the typing animation for score, attempts, and time
+    StartCoroutine(TypeSummaryResults());
+}
+
+
+    Coroutine typingCoroutine;
+
+void ShowFunFact(string fact)
+{
+    if (funFactPanel != null && funFactText != null)
     {
+        isPlaying = false;
         isShowingFunFact = true;
-        yield return new WaitForSeconds(3f);
-        if (funFactPanel != null)
-            funFactPanel.SetActive(false);
-        isShowingFunFact = false;
+
+        // 🚫 Disable card clicks
+        SetCardInteractivity(false);
+
+        funFactPanel.SetActive(true);
+
+        // Stop only the typing coroutine (not everything!)
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        // Start typing animation
+        typingCoroutine = StartCoroutine(TypeFunFact(fact));
     }
+}
+
+IEnumerator TypeFunFact(string fact)
+{
+    funFactText.text = "";
+    float typingSpeed = 0.03f; // ⏱ speed between each character
+
+    foreach (char letter in fact)
+    {
+        funFactText.text += letter;
+        yield return new WaitForSeconds(typingSpeed);
+    }
+
+    // Wait a bit after typing finishes
+    yield return new WaitForSeconds(2.5f);
+
+    StartCoroutine(HideFunFactAfterDelay());
+}
+
+IEnumerator HideFunFactAfterDelay()
+{
+    yield return new WaitForSeconds(0.3f);
+
+    if (funFactPanel != null)
+        funFactPanel.SetActive(false);
+
+    // ▶️ Resume timer and enable card clicks again
+    isPlaying = true;
+    isShowingFunFact = false;
+    SetCardInteractivity(true);
+}
+
 
     public bool IsChecking()
     {
         return isChecking;
     }
+
+    public void SetCardInteractivity(bool state)
+{
+    canInteract = state;
+}
+
+public bool CanInteract()
+{
+    return canInteract;
+}
+
+IEnumerator TypeSummaryResults()
+{
+    if (summaryScoreText == null || summaryAttemptText == null || summaryTimeText == null)
+        yield break;
+
+    summaryScoreText.text = "";
+    summaryAttemptText.text = "";
+    summaryTimeText.text = "";
+
+    float typingSpeed = 0.03f;
+
+    string scoreString = score.ToString();
+    int minutes = Mathf.FloorToInt(elapsedTime / 60);
+    int seconds = Mathf.FloorToInt(elapsedTime % 60);
+    string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
+    string attemptString = attempts.ToString();
+
+    // 🧮 Type the score first
+    foreach (char c in scoreString)
+    {
+        summaryScoreText.text += c;
+        yield return new WaitForSeconds(typingSpeed);
+    }
+
+    yield return new WaitForSeconds(0.3f);
+
+    // ⏱ Then type the time
+    foreach (char c in timeString)
+    {
+        summaryTimeText.text += c;
+        yield return new WaitForSeconds(typingSpeed);
+    }
+
+    yield return new WaitForSeconds(0.3f);
+
+    // 🧠 Finally type the attempts
+    foreach (char c in attemptString)
+    {
+        summaryAttemptText.text += c;
+        yield return new WaitForSeconds(typingSpeed);
+    }
+}
+
 }
