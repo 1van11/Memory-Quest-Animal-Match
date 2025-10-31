@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     public AudioClip timerSoundLoop;
 
     [Header("Background Music")]
-    public AudioSource bgMusicSource;   // 🎵 Add this in the Inspector (your background music AudioSource)
+    public AudioSource bgMusicSource;
 
     [Header("You Win Sound")]
     public AudioClip youWinSound;
@@ -78,26 +78,13 @@ public class GameManager : MonoBehaviour
         funFacts.Add("Dog", "A dog's sense of smell is up to 100,000 times stronger than a human’s. They can also learn more than 1,000 words.");
     }
 
+    // ✅ Clean Update: only handles time counting
     void Update()
     {
         if (isPlaying)
         {
             elapsedTime += Time.deltaTime;
             UpdateTimerText();
-
-            if (timerAudioSource != null && timerSoundLoop != null && !timerAudioSource.isPlaying)
-            {
-                timerAudioSource.clip = timerSoundLoop;
-                timerAudioSource.loop = true;
-                timerAudioSource.Play();
-            }
-        }
-        else
-        {
-            if (timerAudioSource != null && timerAudioSource.isPlaying)
-            {
-                timerAudioSource.Stop();
-            }
         }
     }
 
@@ -181,10 +168,13 @@ public class GameManager : MonoBehaviour
         StartCoroutine(StartTimerWithDelay(0.1f));
     }
 
+    // ✅ Only plays timer sound once with a 0.5s delay
     IEnumerator StartTimerWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         isPlaying = true;
+
+        yield return new WaitForSeconds(0.5f); // delay before sound
 
         if (timerAudioSource != null && timerSoundLoop != null)
         {
@@ -279,34 +269,33 @@ public class GameManager : MonoBehaviour
     }
 
     void CheckLevelComplete()
-{
-    bool allMatched = true;
-
-    foreach (Transform t in gridContainer)
     {
-        CardController cc = t.GetComponent<CardController>();
-        if (!cc.IsMatched())
+        bool allMatched = true;
+
+        foreach (Transform t in gridContainer)
         {
-            allMatched = false;
-            break;
+            CardController cc = t.GetComponent<CardController>();
+            if (!cc.IsMatched())
+            {
+                allMatched = false;
+                break;
+            }
+        }
+
+        if (allMatched)
+        {
+            isPlaying = false;
+            Debug.Log("🎉 Level Complete!");
+
+            StopAllMusic();
+
+            if (timerAudioSource != null && timerAudioSource.isPlaying)
+                timerAudioSource.Stop();
+
+            PlayYouWinSound();
+            StartCoroutine(ShowSummaryAfterDelay());
         }
     }
-
-    if (allMatched)
-    {
-        isPlaying = false;
-        Debug.Log("🎉 Level Complete!");
-
-        // 🛑 Stop everything else before win sound
-        StopAllMusic();
-        if (timerAudioSource != null && timerAudioSource.isPlaying)
-            timerAudioSource.Stop();
-
-        PlayYouWinSound();
-        StartCoroutine(ShowSummaryAfterDelay());
-    }
-}
-    
 
     void PlayYouWinSound()
     {
@@ -339,20 +328,29 @@ public class GameManager : MonoBehaviour
     Coroutine typingCoroutine;
 
     void ShowFunFact(string fact)
+{
+    if (funFactPanel != null && funFactText != null)
     {
-        if (funFactPanel != null && funFactText != null)
-        {
-            isPlaying = false;
-            isShowingFunFact = true;
-            SetCardInteractivity(false);
-            funFactPanel.SetActive(true);
+        isPlaying = false;
+        isShowingFunFact = true;
+        SetCardInteractivity(false);
+        funFactPanel.SetActive(true);
 
-            if (typingCoroutine != null)
-                StopCoroutine(typingCoroutine);
+        // ⏸ Pause the timer sound
+        if (timerAudioSource != null && timerAudioSource.isPlaying)
+            timerAudioSource.Pause();
 
-            typingCoroutine = StartCoroutine(TypeFunFact(fact));
-        }
+        // (Optional) Pause background music for focus
+        if (bgMusicSource != null && bgMusicSource.isPlaying)
+            bgMusicSource.Pause();
+
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeFunFact(fact));
     }
+}
+
 
     IEnumerator TypeFunFact(string fact)
     {
@@ -370,16 +368,26 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator HideFunFactAfterDelay()
-    {
-        yield return new WaitForSeconds(0.3f);
+{
+    yield return new WaitForSeconds(0.3f);
 
-        if (funFactPanel != null)
-            funFactPanel.SetActive(false);
+    if (funFactPanel != null)
+        funFactPanel.SetActive(false);
 
-        isPlaying = true;
-        isShowingFunFact = false;
-        SetCardInteractivity(true);
-    }
+    // ✅ Resume game logic and sounds
+    isPlaying = true;
+    isShowingFunFact = false;
+    SetCardInteractivity(true);
+
+    // ▶️ Resume timer sound
+    if (timerAudioSource != null)
+        timerAudioSource.UnPause();
+
+    // ▶️ Resume background music (optional)
+    if (bgMusicSource != null)
+        bgMusicSource.UnPause();
+}
+
 
     public bool IsChecking() => isChecking;
     public void SetCardInteractivity(bool state) => canInteract = state;
@@ -426,20 +434,79 @@ public class GameManager : MonoBehaviour
     }
 
     private void StopAllMusic()
-{
-    // Stop the main background music
-    if (bgMusicSource != null && bgMusicSource.isPlaying)
-        bgMusicSource.Stop();
-
-    // Stop any other active AudioSources (safety check)
-    foreach (AudioSource source in FindObjectsOfType<AudioSource>())
     {
-        if (source != sfxAudioSource && source != audioSource)
+        if (bgMusicSource != null && bgMusicSource.isPlaying)
+            bgMusicSource.Stop();
+
+        foreach (AudioSource source in FindObjectsOfType<AudioSource>())
         {
-            if (source.isPlaying)
-                source.Stop();
+            if (source != sfxAudioSource && source != audioSource)
+            {
+                if (source.isPlaying)
+                    source.Stop();
+            }
         }
     }
+
+    public void PauseGameAndSound()
+{
+    // ⏸ Pause gameplay
+    isPlaying = false;
+
+    // Pause game time
+    Time.timeScale = 0f;
+
+    // Pause timer sound safely
+    if (timerAudioSource != null && timerAudioSource.isPlaying)
+        timerAudioSource.Pause();
+
+    // Pause background music
+    if (bgMusicSource != null && bgMusicSource.isPlaying)
+        bgMusicSource.Pause();
 }
+
+public void ResumeGameAndSound()
+{
+    Time.timeScale = 1f;
+    isPlaying = true;
+
+    if (timerAudioSource != null)
+        timerAudioSource.UnPause();
+
+    if (bgMusicSource != null)
+        bgMusicSource.UnPause();
+}
+
+
+private IEnumerator ResumeGameSmoothly()
+{
+    // Wait using real time (not affected by Time.timeScale)
+    yield return new WaitForSecondsRealtime(0.1f);
+
+    // Resume time and timer
+    Time.timeScale = 1f;
+    isPlaying = true;
+
+    // ✅ Resume timer sound properly
+    if (timerAudioSource != null)
+    {
+        // In case it was stopped or got reset by Unity, ensure it's looping
+        if (!timerAudioSource.isPlaying)
+        {
+            timerAudioSource.clip = timerSoundLoop;
+            timerAudioSource.loop = true;
+            timerAudioSource.Play();
+        }
+        else
+        {
+            timerAudioSource.UnPause();
+        }
+    }
+
+    // ✅ Resume background music
+    if (bgMusicSource != null)
+        bgMusicSource.UnPause();
+}
+
 
 }

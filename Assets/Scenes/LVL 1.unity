@@ -995,6 +995,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1604245107}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ResumeGameAndSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &210690519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1120,6 +1132,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1604245107}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: PauseGameAndSound
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1543,6 +1567,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: PausePanel
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1604245107}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: PauseGameAndSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &516503621
@@ -3953,8 +3989,8 @@ MonoBehaviour:
   audioSource: {fileID: 1604245109}
   catSound: {fileID: 8300000, guid: 193de3df1e8b003499da77cb888295ed, type: 3}
   dogSound: {fileID: 8300000, guid: d988e872a179de940a4517631687b0d3, type: 3}
-  timerAudioSource: {fileID: 0}
-  timerSoundLoop: {fileID: 0}
+  timerAudioSource: {fileID: 787323632}
+  timerSoundLoop: {fileID: 8300000, guid: 7722c0bddc61bdb409171c7273e0ab09, type: 3}
   bgMusicSource: {fileID: 0}
   youWinSound: {fileID: 8300000, guid: bde11b4bfbe505341b30c43650e22306, type: 3}
   sfxAudioSource: {fileID: 787323632}
@@ -4444,7 +4480,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1643052564}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1604245107}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ResumeGameAndSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1643052564
 MonoBehaviour:
   m_ObjectHideFlags: 0
