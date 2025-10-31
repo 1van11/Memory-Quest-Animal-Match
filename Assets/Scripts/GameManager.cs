@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip catSound;
     public AudioClip dogSound;
+    public AudioClip pigSound;
+    public AudioClip snakeSound;
 
     [Header("Timer Sound")]
     public AudioSource timerAudioSource;
@@ -79,7 +81,9 @@ public class GameManager : MonoBehaviour
     {
         funFacts.Add("Cat", "Cats sleep for about 70% of their lives. They can also make over 100 different sounds.");
         funFacts.Add("Dog", "A dog's sense of smell is up to 100,000 times stronger than a human’s. They can also learn more than 1,000 words.");
-    }
+        funFacts.Add("Pig", "A pig can play video games better than some humans. They also love belly rubs and can recognize their own names when called.");
+        funFacts.Add("Snake", "Snakes smell with their tongues. Also, some snakes can go months without eating after a big meal.");
+    }   
 
     // ✅ Clean Update: only handles time counting
     void Update()
@@ -244,14 +248,26 @@ public class GameManager : MonoBehaviour
     }
 
     void PlayAnimalSound(string animalName)
-    {
-        if (audioSource == null) return;
+{
+    if (audioSource == null) return;
 
-        if (animalName == "Cat" && catSound != null)
-            audioSource.PlayOneShot(catSound);
-        else if (animalName == "Dog" && dogSound != null)
-            audioSource.PlayOneShot(dogSound);
+    switch (animalName)
+    {
+        case "Cat":
+            if (catSound != null) audioSource.PlayOneShot(catSound);
+            break;
+        case "Dog":
+            if (dogSound != null) audioSource.PlayOneShot(dogSound);
+            break;
+        case "Pig":
+            if (pigSound != null) audioSource.PlayOneShot(pigSound);
+            break;
+        case "Snake":
+            if (snakeSound != null) audioSource.PlayOneShot(snakeSound);
+            break;
     }
+}
+
 
     void AddScore(int points)
     {
@@ -510,6 +526,5 @@ private IEnumerator ResumeGameSmoothly()
     if (bgMusicSource != null)
         bgMusicSource.UnPause();
 }
-
 
 }

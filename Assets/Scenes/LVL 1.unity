@@ -2424,6 +2424,53 @@ RectTransform:
   m_AnchoredPosition: {x: 4, y: -46}
   m_SizeDelta: {x: -16.843, y: 13.402}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &829453250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 829453252}
+  - component: {fileID: 829453251}
+  m_Layer: 0
+  m_Name: NextLVL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &829453251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 829453250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f6f008ac5d93746980c02c5f68b045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneToLoad: LoadingScreen2
+  playButton: {fileID: 0}
+  quitButton: {fileID: 0}
+--- !u!4 &829453252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 829453250}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 967.4381, y: 854.32086, z: 0.5328454}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &840406359 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8299680046235868819, guid: 245bdc2618b70cf4fb97a89c3e4fb85d, type: 3}
@@ -3991,6 +4038,8 @@ MonoBehaviour:
   audioSource: {fileID: 1604245109}
   catSound: {fileID: 8300000, guid: 193de3df1e8b003499da77cb888295ed, type: 3}
   dogSound: {fileID: 8300000, guid: d988e872a179de940a4517631687b0d3, type: 3}
+  pigSound: {fileID: 0}
+  snakeSound: {fileID: 0}
   timerAudioSource: {fileID: 787323632}
   timerSoundLoop: {fileID: 8300000, guid: 7722c0bddc61bdb409171c7273e0ab09, type: 3}
   bgMusicSource: {fileID: 0}
@@ -5342,7 +5391,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1932537701}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 829453251}
+        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1932537701
 MonoBehaviour:
   m_ObjectHideFlags: 0
