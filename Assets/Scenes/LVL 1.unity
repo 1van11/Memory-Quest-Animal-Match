@@ -1172,8 +1172,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 4084742496832414bab199ea50c010dd, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -3147,6 +3147,8 @@ MonoBehaviour:
   musicSlider: {fileID: 1358552981}
   sfxSlider: {fileID: 41608945}
   audioMixer: {fileID: 24100000, guid: 34c7bc759ea56654e836476c15ab5e81, type: 2}
+  buttonClickSound: {fileID: 0}
+  sfxMixerGroup: {fileID: 0}
 --- !u!4 &1022118699
 Transform:
   m_ObjectHideFlags: 0
@@ -4002,6 +4004,7 @@ MonoBehaviour:
   summaryTimeText: {fileID: 58935137}
   funFactPanel: {fileID: 1867636251}
   funFactText: {fileID: 749561697}
+  flipCardSound: {fileID: 8300000, guid: 19753ba391d3a6d4e984cfa92802cb6d, type: 3}
 --- !u!4 &1604245108
 Transform:
   m_ObjectHideFlags: 0

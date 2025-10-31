@@ -46,6 +46,9 @@ public class GameManager : MonoBehaviour
     public GameObject funFactPanel;
     public TMP_Text funFactText;
 
+    [Header("SFX")]
+    public AudioClip flipCardSound;     // assign your flip sound clip here
+
     private int score = 0;
     private int attempts = 0;
     private float elapsedTime = 0f;

@@ -14,6 +14,12 @@ public class SettingsMenu : MonoBehaviour
     [Header("Audio Mixer Reference")]
     [SerializeField] private AudioMixer audioMixer;
 
+    [Header("Button Sound Settings")]
+    [SerializeField] private AudioClip buttonClickSound;          // 🔊 Assign your button click sound here
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;       // 🎚 Assign your SFX mixer group here
+
+    private AudioSource buttonAudioSource;
+
     private const string MusicKey = "music";
     private const string SFXKey = "sfx";
 
@@ -21,13 +27,27 @@ public class SettingsMenu : MonoBehaviour
 
     private void Start()
     {
+        // Create AudioSource for button clicks
+        buttonAudioSource = gameObject.AddComponent<AudioSource>();
+        buttonAudioSource.playOnAwake = false;
+        buttonAudioSource.outputAudioMixerGroup = sfxMixerGroup;
+
         // Hide settings panel by default
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
 
-        // Button listeners
-        settingsButton?.onClick.AddListener(OpenSettings);
-        closeButton?.onClick.AddListener(CloseSettings);
+        // Button listeners (with sound)
+        settingsButton?.onClick.AddListener(() =>
+        {
+            PlayButtonSound();
+            OpenSettings();
+        });
+
+        closeButton?.onClick.AddListener(() =>
+        {
+            PlayButtonSound();
+            CloseSettings();
+        });
 
         // Slider listeners
         musicSlider?.onValueChanged.AddListener(SetMusicVolume);
@@ -80,5 +100,11 @@ public class SettingsMenu : MonoBehaviour
 
         if (audioMixer.GetFloat(SFXKey, out float currentSfxDb))
             sfxSlider.value = Mathf.Pow(10f, currentSfxDb / 20f);
+    }
+
+    private void PlayButtonSound()
+    {
+        if (buttonClickSound != null && buttonAudioSource != null)
+            buttonAudioSource.PlayOneShot(buttonClickSound);
     }
 }
