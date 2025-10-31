@@ -11,7 +11,7 @@ public class SplashScreenLoader : MonoBehaviour
     public TMP_Text loadingText;      
 
     [Header("Settings")]
-    public string sceneToLoad = "MainMenu";
+    public string sceneToLoad = "LVL";
     public float totalDuration = 3f;  
 
     void Start()

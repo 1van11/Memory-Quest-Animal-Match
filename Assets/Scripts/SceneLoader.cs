@@ -15,9 +15,6 @@ public class SceneLoader : MonoBehaviour
     [Tooltip("Assign your Quit Button here.")]
     public Button quitButton;
 
-    [Tooltip("Assign your Quit Confirmation Panel here.")]
-    public GameObject quitConfirmPanel;
-
     private void Start()
     {
         // Setup play button
@@ -28,13 +25,9 @@ public class SceneLoader : MonoBehaviour
 
         // Setup quit button
         if (quitButton != null)
-            quitButton.onClick.AddListener(ShowQuitConfirmation);
+            quitButton.onClick.AddListener(QuitGame);
         else
             Debug.LogWarning("⚠️ Quit button not assigned in SceneLoader!");
-
-        // Hide quit confirmation panel on start
-        if (quitConfirmPanel != null)
-            quitConfirmPanel.SetActive(false);
     }
 
     // === PLAY BUTTON ===
@@ -51,27 +44,15 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
-    // === QUIT BUTTON ===
-    public void ShowQuitConfirmation()
-    {
-        if (quitConfirmPanel != null)
-            quitConfirmPanel.SetActive(true);
-    }
-
-    public void ConfirmQuit()
+    // === QUIT BUTTON (Instant) ===
+    public void QuitGame()
     {
         Debug.Log("Exiting game...");
         Application.Quit();
 
-        // Just for testing in the editor
 #if UNITY_EDITOR
+        // Stop Play Mode when testing in Unity Editor
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
-    }
-
-    public void CancelQuit()
-    {
-        if (quitConfirmPanel != null)
-            quitConfirmPanel.SetActive(false);
     }
 }

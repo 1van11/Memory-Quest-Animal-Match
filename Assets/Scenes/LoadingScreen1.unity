@@ -288,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingBarFill: {fileID: 592271437}
   loadingText: {fileID: 50948319}
-  sceneToLoad: MainMenu
+  sceneToLoad: LVL 1
   totalDuration: 3
 --- !u!4 &452403091
 Transform:

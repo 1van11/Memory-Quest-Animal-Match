@@ -21,6 +21,17 @@ public class GameManager : MonoBehaviour
     public AudioClip catSound;
     public AudioClip dogSound;
 
+    [Header("Timer Sound")]
+    public AudioSource timerAudioSource;
+    public AudioClip timerSoundLoop;
+
+    [Header("Background Music")]
+    public AudioSource bgMusicSource;   // 🎵 Add this in the Inspector (your background music AudioSource)
+
+    [Header("You Win Sound")]
+    public AudioClip youWinSound;
+    public AudioSource sfxAudioSource;
+
     [Header("UI References")]
     public TMP_Text scoreText;
     public TMP_Text attemptText;
@@ -73,6 +84,20 @@ public class GameManager : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             UpdateTimerText();
+
+            if (timerAudioSource != null && timerSoundLoop != null && !timerAudioSource.isPlaying)
+            {
+                timerAudioSource.clip = timerSoundLoop;
+                timerAudioSource.loop = true;
+                timerAudioSource.Play();
+            }
+        }
+        else
+        {
+            if (timerAudioSource != null && timerAudioSource.isPlaying)
+            {
+                timerAudioSource.Stop();
+            }
         }
     }
 
@@ -84,15 +109,6 @@ public class GameManager : MonoBehaviour
         if (timerText != null)
             timerText.text = formattedTime;
     }
-
-    public void OnClick()
-{
-    // Stop clicking while fun fact or checking pairs
-    if (!GameManager.instance.CanInteract() || GameManager.instance.IsChecking())
-        return;
-
-    // Your existing flip logic here
-}
 
     public void SetupLevel1()
     {
@@ -162,8 +178,24 @@ public class GameManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
-        isPlaying = true;
+        StartCoroutine(StartTimerWithDelay(0.1f));
     }
+
+    IEnumerator StartTimerWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isPlaying = true;
+
+        if (timerAudioSource != null && timerSoundLoop != null)
+        {
+            timerAudioSource.clip = timerSoundLoop;
+            timerAudioSource.loop = true;
+            timerAudioSource.Play();
+        }
+    }
+
+    public void PauseTimer() => isPlaying = false;
+    public void ResumeTimer() => isPlaying = true;
 
     public void CardRevealed(CardController card)
     {
@@ -191,13 +223,10 @@ public class GameManager : MonoBehaviour
             AddScore(5);
 
             string animalName = revealedCards[0].frontSprite.name;
-
             PlayAnimalSound(animalName);
 
             if (funFacts.ContainsKey(animalName))
-            {
                 ShowFunFact(funFacts[animalName]);
-            }
         }
         else
         {
@@ -216,9 +245,8 @@ public class GameManager : MonoBehaviour
     IEnumerator WaitForFunFactThenCheckComplete()
     {
         while (isShowingFunFact)
-        {
             yield return null;
-        }
+
         CheckLevelComplete();
     }
 
@@ -251,31 +279,50 @@ public class GameManager : MonoBehaviour
     }
 
     void CheckLevelComplete()
+{
+    bool allMatched = true;
+
+    foreach (Transform t in gridContainer)
     {
-        bool allMatched = true;
-
-        foreach (Transform t in gridContainer)
+        CardController cc = t.GetComponent<CardController>();
+        if (!cc.IsMatched())
         {
-            CardController cc = t.GetComponent<CardController>();
-            if (!cc.IsMatched())
-            {
-                allMatched = false;
-                break;
-            }
+            allMatched = false;
+            break;
         }
+    }
 
-        if (allMatched)
-        {
-            isPlaying = false;
-            Debug.Log("Level Complete!");
-            StartCoroutine(ShowSummaryAfterDelay());
-        }
+    if (allMatched)
+    {
+        isPlaying = false;
+        Debug.Log("🎉 Level Complete!");
+
+        // 🛑 Stop everything else before win sound
+        StopAllMusic();
+        if (timerAudioSource != null && timerAudioSource.isPlaying)
+            timerAudioSource.Stop();
+
+        PlayYouWinSound();
+        StartCoroutine(ShowSummaryAfterDelay());
+    }
+}
+    
+
+    void PlayYouWinSound()
+    {
+        if (youWinSound == null) return;
+
+        AudioSource target = sfxAudioSource != null ? sfxAudioSource : audioSource;
+
+        if (target != null)
+            target.PlayOneShot(youWinSound);
+        else
+            AudioSource.PlayClipAtPoint(youWinSound, Camera.main.transform.position);
     }
 
     IEnumerator ShowSummaryAfterDelay()
     {
         yield return new WaitForSeconds(0.3f);
-        isPlaying = false;
 
         if (summaryUI != null)
         {
@@ -285,121 +332,113 @@ public class GameManager : MonoBehaviour
     }
 
     void ShowSummaryResults()
-{
-    // Start the typing animation for score, attempts, and time
-    StartCoroutine(TypeSummaryResults());
-}
-
+    {
+        StartCoroutine(TypeSummaryResults());
+    }
 
     Coroutine typingCoroutine;
 
-void ShowFunFact(string fact)
-{
-    if (funFactPanel != null && funFactText != null)
+    void ShowFunFact(string fact)
     {
-        isPlaying = false;
-        isShowingFunFact = true;
+        if (funFactPanel != null && funFactText != null)
+        {
+            isPlaying = false;
+            isShowingFunFact = true;
+            SetCardInteractivity(false);
+            funFactPanel.SetActive(true);
 
-        // 🚫 Disable card clicks
-        SetCardInteractivity(false);
+            if (typingCoroutine != null)
+                StopCoroutine(typingCoroutine);
 
-        funFactPanel.SetActive(true);
-
-        // Stop only the typing coroutine (not everything!)
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-
-        // Start typing animation
-        typingCoroutine = StartCoroutine(TypeFunFact(fact));
-    }
-}
-
-IEnumerator TypeFunFact(string fact)
-{
-    funFactText.text = "";
-    float typingSpeed = 0.03f; // ⏱ speed between each character
-
-    foreach (char letter in fact)
-    {
-        funFactText.text += letter;
-        yield return new WaitForSeconds(typingSpeed);
+            typingCoroutine = StartCoroutine(TypeFunFact(fact));
+        }
     }
 
-    // Wait a bit after typing finishes
-    yield return new WaitForSeconds(2.5f);
-
-    StartCoroutine(HideFunFactAfterDelay());
-}
-
-IEnumerator HideFunFactAfterDelay()
-{
-    yield return new WaitForSeconds(0.3f);
-
-    if (funFactPanel != null)
-        funFactPanel.SetActive(false);
-
-    // ▶️ Resume timer and enable card clicks again
-    isPlaying = true;
-    isShowingFunFact = false;
-    SetCardInteractivity(true);
-}
-
-
-    public bool IsChecking()
+    IEnumerator TypeFunFact(string fact)
     {
-        return isChecking;
+        funFactText.text = "";
+        float typingSpeed = 0.03f;
+
+        foreach (char letter in fact)
+        {
+            funFactText.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        yield return new WaitForSeconds(2.5f);
+        StartCoroutine(HideFunFactAfterDelay());
     }
 
-    public void SetCardInteractivity(bool state)
-{
-    canInteract = state;
-}
-
-public bool CanInteract()
-{
-    return canInteract;
-}
-
-IEnumerator TypeSummaryResults()
-{
-    if (summaryScoreText == null || summaryAttemptText == null || summaryTimeText == null)
-        yield break;
-
-    summaryScoreText.text = "";
-    summaryAttemptText.text = "";
-    summaryTimeText.text = "";
-
-    float typingSpeed = 0.03f;
-
-    string scoreString = score.ToString();
-    int minutes = Mathf.FloorToInt(elapsedTime / 60);
-    int seconds = Mathf.FloorToInt(elapsedTime % 60);
-    string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
-    string attemptString = attempts.ToString();
-
-    // 🧮 Type the score first
-    foreach (char c in scoreString)
+    IEnumerator HideFunFactAfterDelay()
     {
-        summaryScoreText.text += c;
-        yield return new WaitForSeconds(typingSpeed);
+        yield return new WaitForSeconds(0.3f);
+
+        if (funFactPanel != null)
+            funFactPanel.SetActive(false);
+
+        isPlaying = true;
+        isShowingFunFact = false;
+        SetCardInteractivity(true);
     }
 
-    yield return new WaitForSeconds(0.8f);
+    public bool IsChecking() => isChecking;
+    public void SetCardInteractivity(bool state) => canInteract = state;
+    public bool CanInteract() => canInteract;
 
-    // ⏱ Then type the time
-    foreach (char c in timeString)
+    IEnumerator TypeSummaryResults()
     {
-        summaryTimeText.text += c;
-        yield return new WaitForSeconds(typingSpeed);
+        if (summaryScoreText == null || summaryAttemptText == null || summaryTimeText == null)
+            yield break;
+
+        summaryScoreText.text = "";
+        summaryAttemptText.text = "";
+        summaryTimeText.text = "";
+
+        float typingSpeed = 0.03f;
+
+        string scoreString = score.ToString();
+        int minutes = Mathf.FloorToInt(elapsedTime / 60);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60);
+        string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
+        string attemptString = attempts.ToString();
+
+        foreach (char c in scoreString)
+        {
+            summaryScoreText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        yield return new WaitForSeconds(0.8f);
+
+        foreach (char c in timeString)
+        {
+            summaryTimeText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        yield return new WaitForSeconds(0.8f);
+
+        foreach (char c in attemptString)
+        {
+            summaryAttemptText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
     }
 
-    yield return new WaitForSeconds(0.8f);
+    private void StopAllMusic()
+{
+    // Stop the main background music
+    if (bgMusicSource != null && bgMusicSource.isPlaying)
+        bgMusicSource.Stop();
 
-    // 🧠 Finally type the attempts
-    foreach (char c in attemptString)
+    // Stop any other active AudioSources (safety check)
+    foreach (AudioSource source in FindObjectsOfType<AudioSource>())
     {
-        summaryAttemptText.text += c;
-        yield return new WaitForSeconds(typingSpeed);
+        if (source != sfxAudioSource && source != audioSource)
+        {
+            if (source.isPlaying)
+                source.Stop();
+        }
     }
 }
 
