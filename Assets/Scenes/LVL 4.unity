@@ -2721,7 +2721,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &574504963
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4149,7 +4149,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &991838594
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6288,6 +6288,12 @@ MonoBehaviour:
   foxSound: {fileID: 8300000, guid: 97017b8b1f4bcb043887dacef2e29043, type: 3}
   frogSound: {fileID: 8300000, guid: 2f5e61c92470a494084f148296016c23, type: 3}
   HedgehogSound: {fileID: 8300000, guid: 629a0887d5e96e243b9e9cc8cc164261, type: 3}
+  horseSound: {fileID: 0}
+  koalaSound: {fileID: 0}
+  lionSound: {fileID: 0}
+  mouseSound: {fileID: 0}
+  owlSound: {fileID: 0}
+  pandaSound: {fileID: 0}
   timerAudioSource: {fileID: 787323632}
   timerSoundLoop: {fileID: 8300000, guid: 7722c0bddc61bdb409171c7273e0ab09, type: 3}
   bgMusicSource: {fileID: 0}

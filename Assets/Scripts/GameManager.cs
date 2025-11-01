@@ -30,6 +30,12 @@ public class GameManager : MonoBehaviour
     public AudioClip foxSound;
     public AudioClip frogSound;
     public AudioClip HedgehogSound;
+    public AudioClip horseSound;
+    public AudioClip koalaSound;
+    public AudioClip lionSound;
+    public AudioClip mouseSound;
+    public AudioClip owlSound;
+    public AudioClip pandaSound;
 
     [Header("Timer Sound")]
     public AudioSource timerAudioSource;
@@ -99,6 +105,12 @@ public class GameManager : MonoBehaviour
         funFacts.Add("Fox","Fox can make over 40 sounds, from tiny chirps to spooky screams. Foxes also use their tails like blankets to keep warm while sleeping.");
         funFacts.Add("Frog","Frogs drink through their skin instead of their mouths. They can also jump over 20 times their body length in one leap.");
         funFacts.Add("Hedgehog","Hedgehogs are born with soft spines that harden within hours. And when scared, they roll into a tight ball to protect themselves.");
+        funFacts.Add("Horse", "Horses can even sleep standing up. They have a special “stay” system in their leg ligaments that locks their knees, allowing them to doze on their feet without falling over.");
+        funFacts.Add("Koala", "Has fingerprints like humans, so don’t let one near a cookie jar. Also, koalas sleep up to 20 hours a day, basically napping pros.");
+        funFacts.Add("Lion", "The only cat that loves to live with friends in a big family called a pride. Also, a lion’s roar is so loud it can shake the ground up to 8 kilometers away.");
+        funFacts.Add("Mouse", "Mice can sing — they make ultrasonic sounds to communicate. They are also excellent swimmers and jumpers, despite their size.");
+        funFacts.Add("Owl", "Owls can turn their heads almost all the way around, up to 270°. They do this because their big eyes are fixed in their skulls, so they have to turn their necks to look around");
+        funFacts.Add("Panda", "A panda eats bamboo all day, like 99% of its food is just sticks. Also, baby pandas are born tiny and pink, weighing less than a cup of tea.");
     }   
 
     // ✅ Clean Update: only handles time counting
@@ -305,9 +317,25 @@ public class GameManager : MonoBehaviour
         case "Hedgehog":
             if (HedgehogSound != null) audioSource.PlayOneShot(HedgehogSound);
             break;
-        default:
-            Debug.LogWarning($"No sound found for animal: {animalName}");
-            break;
+        case "Horse":
+    if (horseSound != null) audioSource.PlayOneShot(horseSound);
+    break;
+case "Koala":
+    if (koalaSound != null) audioSource.PlayOneShot(koalaSound);
+    break;
+case "Lion":
+    if (lionSound != null) audioSource.PlayOneShot(lionSound);
+    break;
+case "Mouse":
+    if (mouseSound != null) audioSource.PlayOneShot(mouseSound);
+    break;
+case "Owl":
+    if (owlSound != null) audioSource.PlayOneShot(owlSound);
+    break;
+case "Panda":
+    if (pandaSound != null) audioSource.PlayOneShot(pandaSound);
+    break;
+    default: Debug.LogWarning($"No sound found for animal: {animalName}"); break;
     }
 }
 
