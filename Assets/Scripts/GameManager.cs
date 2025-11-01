@@ -612,20 +612,29 @@ private IEnumerator ResumeGameSmoothly()
 {
     string currentScene = SceneManager.GetActiveScene().name;
 
-    for (int i = 0; i < 20; i++)
+    // ✅ Extract the current level number safely
+    if (currentScene.StartsWith("Level"))
     {
-        string levelName = $"Level{i + 1}";
-        if (levelName == currentScene)
+        string numberPart = currentScene.Replace("Level", "");
+        if (int.TryParse(numberPart, out int currentLevel))
         {
-            int nextLevelIndex = i + 2;
-            PlayerPrefs.SetInt($"LevelUnlocked_{nextLevelIndex}", 1);
-            PlayerPrefs.Save(); // ✅ forces data write
-            Debug.Log($"Unlocked Level {nextLevelIndex}");
-            break;
+            int nextLevel = currentLevel + 1;
+            PlayerPrefs.SetInt($"LevelUnlocked_{nextLevel}", 1);
+            PlayerPrefs.Save(); // 💾 make sure it’s written to disk
+            Debug.Log($"✅ Level {nextLevel} unlocked!");
         }
+        else
+        {
+            Debug.LogWarning("⚠️ Could not parse level number from scene name.");
+        }
+    }
+    else
+    {
+        Debug.LogWarning("⚠️ Current scene is not named 'LevelX'.");
     }
 }
 
-
 }
+
+
 
