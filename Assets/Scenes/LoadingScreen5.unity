@@ -303,7 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingBarFill: {fileID: 592271437}
   loadingText: {fileID: 50948319}
-  sceneToLoad: Mainmenu
+  sceneToLoad: LVL 5
   totalDuration: 3
 --- !u!1 &592271435
 GameObject:
