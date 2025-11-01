@@ -22,6 +22,14 @@ public class GameManager : MonoBehaviour
     public AudioClip dogSound;
     public AudioClip pigSound;
     public AudioClip snakeSound;
+    public AudioClip bearSound;
+    public AudioClip chickenSound;
+    public AudioClip cowSound;
+    public AudioClip duckSound;
+    public AudioClip elephantSound;
+    public AudioClip foxSound;
+    public AudioClip frogSound;
+    public AudioClip HedgehogSound;
 
     [Header("Timer Sound")]
     public AudioSource timerAudioSource;
@@ -83,6 +91,14 @@ public class GameManager : MonoBehaviour
         funFacts.Add("Dog", "A dog's sense of smell is up to 100,000 times stronger than a human’s. They can also learn more than 1,000 words.");
         funFacts.Add("Pig", "A pig can play video games better than some humans. They also love belly rubs and can recognize their own names when called.");
         funFacts.Add("Snake", "Snakes smell with their tongues. Also, some snakes can go months without eating after a big meal.");
+        funFacts.Add("Bear", "Bear can smell your lunch from 30 kilometers away. Also, some bears wave at people; they’ve learned it gets them snacks.");
+        funFacts.Add("Chicken", "Chickens are basically tiny dinosaurs. Scientists say the chicken is the closest living relative of the T. rex dinosaur.");
+        funFacts.Add("Cow", "Cows have best friends. They pick a buddy in the herd and become calmer when together (and can get stressed when apart).");
+        funFacts.Add("Duck", "Ducks can sleep with one eye open. One half of their brain stays awake to watch for danger, while the other half rests.");
+        funFacts.Add("Elephant","Elephants have an incredible sense of smell. They can detect water from approximately 19 km away, which helps them locate watering holes in the wild.");
+        funFacts.Add("Fox","Fox can make over 40 sounds, from tiny chirps to spooky screams. Foxes also use their tails like blankets to keep warm while sleeping.");
+        funFacts.Add("Frog","Frogs drink through their skin instead of their mouths. They can also jump over 20 times their body length in one leap.");
+        funFacts.Add("Hedgehog","Hedgehogs are born with soft spines that harden within hours. And when scared, they roll into a tight ball to protect themselves.");
     }   
 
     // ✅ Clean Update: only handles time counting
@@ -265,8 +281,37 @@ public class GameManager : MonoBehaviour
         case "Snake":
             if (snakeSound != null) audioSource.PlayOneShot(snakeSound);
             break;
+        case "Bear":
+            if (bearSound != null) audioSource.PlayOneShot(bearSound);
+            break;
+        case "Chicken":
+            if (chickenSound != null) audioSource.PlayOneShot(chickenSound);
+            break;
+        case "Cow":
+            if (cowSound != null) audioSource.PlayOneShot(cowSound);
+            break;
+        case "Duck":
+            if (duckSound != null) audioSource.PlayOneShot(duckSound);
+            break;
+        case "Elephant":
+            if (elephantSound != null) audioSource.PlayOneShot(elephantSound);
+            break;
+        case "Fox":
+            if (foxSound != null) audioSource.PlayOneShot(foxSound);
+            break;
+        case "Frog":
+            if (frogSound != null) audioSource.PlayOneShot(frogSound);
+            break;
+        case "Hedgehog":
+            if (HedgehogSound != null) audioSource.PlayOneShot(HedgehogSound);
+            break;
+        default:
+            Debug.LogWarning($"No sound found for animal: {animalName}");
+            break;
     }
 }
+
+
 
 
     void AddScore(int points)

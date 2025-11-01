@@ -16,11 +16,23 @@ EditorBuildSettings:
     guid: 270dc635bf51dc04dbde98e98408abc7
   - enabled: 1
     path: Assets/Scenes/LoadingScreen2.unity
+    guid: 040fae8a814f55d408d0b08cc34f266c
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreen3.unity
     guid: 29b79a1db1b165c418f3c1227a1423b4
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreen4.unity
+    guid: 657cac0391bdcfd4f9eaebb4e632c70f
   - enabled: 1
     path: Assets/Scenes/LVL 1.unity
     guid: f603ef14b42ece245a19cd95feb649a5
   - enabled: 1
     path: Assets/Scenes/LVL 2.unity
     guid: e806577fc05fdc64fbaebc9d6f723053
+  - enabled: 1
+    path: Assets/Scenes/LVL 3.unity
+    guid: 9ad7b294322fbc64287c6ea12075dde1
+  - enabled: 1
+    path: Assets/Scenes/LVL 4.unity
+    guid: 77bdd86396c483540bc5604cba6bb2b0
   m_configObjects: {}
