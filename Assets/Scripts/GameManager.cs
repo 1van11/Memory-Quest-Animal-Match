@@ -64,6 +64,7 @@ public class GameManager : MonoBehaviour
 
     [Header("SFX")]
     public AudioClip flipCardSound;     // assign your flip sound clip here
+    public AudioClip wrongPairSound;
 
     private int score = 0;
     private int attempts = 0;
@@ -254,10 +255,14 @@ public class GameManager : MonoBehaviour
                 ShowFunFact(funFacts[animalName]);
         }
         else
-        {
-            StartCoroutine(revealedCards[0].FlipToBack());
-            StartCoroutine(revealedCards[1].FlipToBack());
-        }
+{
+    // 🔊 Play wrong pair sound
+    if (audioSource != null && wrongPairSound != null)
+        audioSource.PlayOneShot(wrongPairSound);
+
+    StartCoroutine(revealedCards[0].FlipToBack());
+    StartCoroutine(revealedCards[1].FlipToBack());
+}
 
         yield return new WaitForSeconds(0.5f);
 

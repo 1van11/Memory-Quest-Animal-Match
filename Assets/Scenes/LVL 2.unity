@@ -4300,6 +4300,7 @@ MonoBehaviour:
   funFactPanel: {fileID: 1867636251}
   funFactText: {fileID: 749561697}
   flipCardSound: {fileID: 8300000, guid: 19753ba391d3a6d4e984cfa92802cb6d, type: 3}
+  wrongPairSound: {fileID: 8300000, guid: 1c64ee358195b8242a7fc964f0b69056, type: 3}
 --- !u!4 &1604245108
 Transform:
   m_ObjectHideFlags: 0

@@ -312,7 +312,7 @@ MonoBehaviour:
   aboutUsText: {fileID: 1319066006}
   aboutButton: {fileID: 679833929}
   closeButton: {fileID: 2010654199}
-  aboutText: "Bachelor of Science in Entertainment and Multimedia Computing\n\nMacians,Ivan
+  aboutText: "Bachelor of Science in Entertainment and Multimedia Computing\n\n\nMacians,Ivan
     Dave \nNatividad,Isaiah Daniel\nDeguit,Mario\nDeguit,Jhonn Paul\nTumbagahan,Jhon
     Mark\nSam,Sean Jericho\nSantillan,Christine"
   typingSpeed: 0.03
@@ -756,6 +756,82 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 281677588}
   m_CullTransparentMesh: 1
+--- !u!1 &317731977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 317731978}
+  - component: {fileID: 317731980}
+  - component: {fileID: 317731979}
+  m_Layer: 5
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &317731978
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317731977}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 447086241}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 7.8225, y: 352}
+  m_SizeDelta: {x: 603.9478, y: 508.0834}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &317731979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317731977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 0a7171c2e6533924b8f11502a26dc57e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &317731980
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317731977}
+  m_CullTransparentMesh: 1
 --- !u!1 &447086240
 GameObject:
   m_ObjectHideFlags: 0
@@ -773,7 +849,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &447086241
 RectTransform:
   m_ObjectHideFlags: 0
@@ -789,6 +865,7 @@ RectTransform:
   - {fileID: 895529198}
   - {fileID: 1319066004}
   - {fileID: 2010654200}
+  - {fileID: 317731978}
   m_Father: {fileID: 2045295346}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2299,8 +2376,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 7.8225, y: -60}
-  m_SizeDelta: {x: 688.9182, y: 645.7248}
+  m_AnchoredPosition: {x: 7.8225, y: -308}
+  m_SizeDelta: {x: 688.9182, y: 870.3161}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1319066005
 CanvasRenderer:
@@ -2357,8 +2434,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 55
+  m_fontSizeBase: 55
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
