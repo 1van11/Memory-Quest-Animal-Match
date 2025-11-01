@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -389,6 +391,8 @@ case "Panda":
             if (timerAudioSource != null && timerAudioSource.isPlaying)
                 timerAudioSource.Stop();
 
+            // 🔓 Unlock the next level
+            UnlockNextLevel();
             PlayYouWinSound();
             StartCoroutine(ShowSummaryAfterDelay());
         }
@@ -604,5 +608,24 @@ private IEnumerator ResumeGameSmoothly()
     if (bgMusicSource != null)
         bgMusicSource.UnPause();
 }
+    void UnlockNextLevel()
+{
+    string currentScene = SceneManager.GetActiveScene().name;
+
+    for (int i = 0; i < 20; i++)
+    {
+        string levelName = $"Level{i + 1}";
+        if (levelName == currentScene)
+        {
+            int nextLevelIndex = i + 2;
+            PlayerPrefs.SetInt($"LevelUnlocked_{nextLevelIndex}", 1);
+            PlayerPrefs.Save(); // ✅ forces data write
+            Debug.Log($"Unlocked Level {nextLevelIndex}");
+            break;
+        }
+    }
+}
+
 
 }
+
